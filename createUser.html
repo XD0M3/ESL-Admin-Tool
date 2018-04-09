@@ -1,0 +1,70 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="manifest" href="site.webmanifest">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <script src="js/jquery.js"></script>
+  <link rel="stylesheet" href="css/core.css">
+</head>
+<body>
+<ul class="header">
+  <li style="float: left">
+    <img src="esl/_Web/ESL_Logo_Horiz_light.png" height="32" class="line" style="padding-left: 12px">
+  </li>
+  <li style="float: right" id="close">
+    <img src="esl/close.png" class="line">
+  </li>
+  <li style="float: right" id="klein">
+    <img src="esl/klein.png" class="line">
+  </li>
+</ul>
+<div class="user">
+  <table class="esladmin">
+    <tr><td class="titleLogin">Informations</td></tr>
+    <tr><td><input type="text" id="name" placeholder="ESL Name" class="loginInput"></td></tr>
+    <tr><td><input type="text" id="eid" placeholder="ESL ID" class="loginInput"></td></tr>
+    <tr><td><input type="text" id="sid" placeholder="Squad ID" class="loginInput"></td></tr>
+    <tr><td><button class="loginButton">User Data</button></td></tr>
+  </table>
+</div>
+<script>
+  window.$ = window.jQuery = require('./js/jquery.js');
+  const remote = require('electron').remote
+
+  const path = require('path');
+  const url = require('url');
+
+  $('#close').on('click', e => {
+    remote.getCurrentWindow().close();
+  });
+  $('#klein').on('click', e => {
+    remote.getCurrentWindow().minimize();
+  });
+
+  const Store = require('electron-store');
+  const store = new Store();
+  $('.loginButton').on('click', e => {
+    var name = $('#name').val();
+    var esl_id = $('#eid').val();
+    var squad_id = $('#sid').val();
+    if(name != null && esl_id != null && squad_id != null){
+      store.set('name', name);
+      store.set('eslid', esl_id);
+      store.set('squadid', squad_id);
+      remote.getCurrentWindow().loadURL(
+        url.format({
+          pathname: path.join(__dirname, 'index.html'),
+          protocol: 'file:',
+          slashes: true
+        }));
+    }
+  });
+
+
+</script>
+</body>
+</html>

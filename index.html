@@ -1,0 +1,93 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="manifest" href="site.webmanifest">
+  <script src="js/jquery.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="css/core.css">
+</head>
+<body>
+<ul class="header">
+  <li style="float: left">
+    <img src="esl/_Web/ESL_Logo_Horiz_light.png" height="32" class="line" style="padding-left: 12px">
+  </li>
+  <li style="float: left" class="time">
+    <a href="index.html" class="timeline">Home</a>
+  </li>
+  <li style="float: right" id="close">
+    <img src="esl/close.png" class="line">
+  </li>
+  <li style="float: right" id="klein">
+    <img src="esl/klein.png" class="line">
+  </li>
+  <li class="ShowName" style="float: right">
+    Placeholder
+  </li>
+</ul>
+
+<div class="auswahl">
+  <ul class="coices">
+    <li class="choice" id="ac">Admin Comments</li>
+    <li class="choice" id="tools">Tools</li>
+    <li class="choice" id="docs">Documentation</li>
+  </ul>
+</div>
+<script>
+  window.$ = window.jQuery = require('./js/jquery.js');
+  const remote = require('electron').remote;
+  const {ipcRenderer} = require('electron');
+  const path = require('path');
+  const url = require('url');
+
+  $('#close').on('click', e => {
+    remote.getCurrentWindow().close();
+  });
+  $('#klein').on('click', e => {
+    remote.getCurrentWindow().minimize();
+  });
+
+  var level = "1";
+  const Store = require('electron-store');
+  const store = new Store();
+
+  $('.ShowName').text(store.get('name'));
+  $('.ShowName').on('click', e => {
+    remote.getCurrentWindow().loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'createUser.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+    });
+    $('#ac').on('click', e => {
+      remote.getCurrentWindow().loadURL(
+        url.format({
+          pathname: path.join(__dirname, 'chooseAC.html'),
+          protocol: 'file:',
+          slashes: true
+        }));
+      });
+    $('#docs').on('click', e => {
+      remote.getCurrentWindow().maximize();
+      remote.getCurrentWindow().loadURL(
+        url.format({
+          pathname: path.join(__dirname, 'docs.html'),
+          protocol: 'file:',
+          slashes: true
+        }));
+    });
+      $('#tools').on('click', e => {
+        remote.getCurrentWindow().loadURL(
+          url.format({
+            pathname: path.join(__dirname, 'chooseTools.html'),
+            protocol: 'file:',
+            slashes: true
+          }));
+        });
+</script>
+</body>
+</html>

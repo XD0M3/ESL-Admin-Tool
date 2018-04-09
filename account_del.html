@@ -1,0 +1,143 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="manifest" href="site.webmanifest">
+  <script src="js/jquery.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="css/core.css">
+</head>
+<body>
+<ul class="header">
+  <li style="float: left">
+    <img src="esl/_Web/ESL_Logo_Horiz_light.png" height="32" class="line" style="padding-left: 12px">
+  </li>
+  <li style="float: left" class="time">
+    <a href="index.html" class="timeline">Home</a><b class="lop">&gt;</b><a class="timeline" href="chooseAC.html">AC</a><b class="lop">&gt;</b><a class="timeline" href="account_del.html">Account delete
+    </a>
+  </li>
+  <li style="float: right" id="close">
+    <img src="esl/close.png" class="line">
+  </li>
+  <li style="float: right" id="klein">
+    <img src="esl/klein.png" class="line">
+  </li>
+  <li class="ShowName" style="float: right">
+    Placeholder
+  </li>
+</ul>
+
+<div class="auswahl">
+  <div class="coices">
+    <table class="formAc">
+      <tr>
+        <td>
+          <span class="TitleAC">
+            Account delete
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" id="accountName" placeholder="Account Name (e.g XD0M3)" class="inputAC">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" id="accountId" placeholder="Account ID (e.g 10221722)" class="inputAC">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <select class="selectAC">
+            <option value="Multiaccount">Multiaccount</option>
+            <option value="Requested by the Player">Requested by the Player</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" id="ticketid" placeholder="Ticket Number (#....)" class="inputAC">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button class="loginButton" onclick="generateAC()">
+            Generate AC
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <textarea class="ac">
+          </textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+<script>
+  function generateAC(){
+        let accountid = $('#accountId').val();
+        let accountname = $('#accountName').val();
+        let reason = $('.selectAC').val();
+        let ticket_id = $('#ticketid').val();
+
+        const Store = require('electron-store');
+        const store = new Store();
+
+        let ac = "b[Account deleted]b\n------------------ \nReason: <reason>\nMain account: url[http://play.eslgaming.com/player/<accountid>][<accountname>]url\nTicket: url[http://play.eslgaming.com/leagueoflegends/support/<ticket>][<ticket>]url\n------------------\n<name>\n<id>:<squad_id>";
+        ac = ac.replace("<accountid>", accountid);
+        ac = ac.replace("<accountname>", accountname)
+        ac = ac.replace("<reason>", reason);
+        ac = ac.replace("<ticket>", ticket_id);
+        ac = ac.replace("<ticket>", ticket_id);
+        ac = ac.replace("<name>", store.get('name'));
+        ac = ac.replace("<id>", store.get('eslid'));
+        ac = ac.replace("<squad_id>", store.get('squadid'));
+
+        $('.ac').val(ac);
+  }
+</script>
+<script>
+  window.$ = window.jQuery = require('./js/jquery.js');
+/*
+FA Suspicion
+Account delete
+FA Lockremoved
+Multiaccount
+LB removed
+Ga delete
+
+
+  */
+  const remote = require('electron').remote;
+  const {ipcRenderer} = require('electron');
+  const path = require('path');
+  const url = require('url');
+  $('#close').on('click', e => {
+    remote.getCurrentWindow().close();
+  });
+  $('#klein').on('click', e => {
+    remote.getCurrentWindow().minimize();
+  });
+
+  var level = "1";
+  const Store = require('electron-store');
+  const store = new Store();
+
+  $('.ShowName').text(store.get('name'));
+  $('.ShowName').on('click', e => {
+    remote.getCurrentWindow().loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'createUser.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+    });
+</script>
+</body>
+</html>

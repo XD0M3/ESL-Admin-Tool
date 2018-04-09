@@ -1,0 +1,184 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="manifest" href="site.webmanifest">
+  <script src="js/jquery.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="css/core.css">
+</head>
+<body>
+<ul class="header">
+  <li style="float: left">
+    <img src="esl/_Web/ESL_Logo_Horiz_light.png" height="32" class="line" style="padding-left: 12px">
+  </li>
+  <li style="float: left" class="time">
+    <a href="index.html" class="timeline">Home</a><b class="lop">&gt;</b><a class="timeline" href="chooseTools.html">Tools</a><b class="lop">&gt;</b><a class="timeline" href="gafetch.html">Gameaccount fetching
+    </a>
+  </li>
+  <li style="float: right" id="close">
+    <img src="esl/close.png" class="line">
+  </li>
+  <li style="float: right" id="klein">
+    <img src="esl/klein.png" class="line">
+  </li>
+  <li class="ShowName" style="float: right">
+    Placeholder
+  </li>
+</ul>
+
+<div class="auswahl">
+  <div class="coices">
+    <table class="formAc">
+      <tr>
+        <td>
+          <span class="TitleAC">
+            Gameaccount fetch
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <input type="text" id="url" placeholder="URL des Cups (HTTP)" class="inputAC">
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <select class="selectAC" id="region">
+            <option value="euw">EUW</option>
+            <option value="eune">EUNE</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <select name="log" id="log" class="selectAC" hidden>
+            <option value="0">0 - normal</option>
+            <option value="1">1 - info </option>
+            <option value="2">2 - warning</option>
+            <option value="3">3 - critical</option>
+            <option value="4">4 - trace</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <select name="top" id="top" class="selectAC">
+            <option value="2">2 (final) / takes +- 20 sec</option>
+            <option value="4">4 (above + 3rd place) / takes +- 20 sec</option>
+            <option value="8">8 (above + Quarter) / takes +- 40 sec</option>
+            <option value="16">16 (above + RO 16) / takes +- 1m 30 sec</option>
+            <option value="32">32 (above + RO 32) / takes +- 2m 20 sec</option>
+            <option value="64">64 (above + RO 64)</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <button class="loginButton" onclick="fetch()">
+            Fetch Gameaccounts
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <textarea class="ac">
+          </textarea>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+<script>
+  window.$ = window.jQuery = require('./js/jquery.js');
+/*
+FA Suspicion
+Account delete
+FA Lockremoved
+Multiaccount
+LB removed
+Ga delete
+
+
+  */
+  const remote = require('electron').remote;
+  const {ipcRenderer} = require('electron');
+  const path = require('path');
+  const url = require('url');
+  $('#close').on('click', e => {
+    remote.getCurrentWindow().close();
+  });
+  $('#klein').on('click', e => {
+    remote.getCurrentWindow().minimize();
+  });
+
+  var level = "1";
+  const Store = require('electron-store');
+  const store = new Store();
+
+  $('.ShowName').text(store.get('name'));
+  $('.ShowName').on('click', e => {
+    remote.getCurrentWindow().loadURL(
+      url.format({
+        pathname: path.join(__dirname, 'createUser.html'),
+        protocol: 'file:',
+        slashes: true
+      }));
+    });
+</script>
+<script>
+  function fetch(){
+    let url = $('#url').val();
+    let log = $('#log').val();
+    let region = $('#region').val();
+    let top = $('#top').val();
+    url = url.replace("https", "http");
+    var ga = $.post( "https://esl.xanerol.com/tools/cupParser2.php", { value: url, log: log, region: region, top: top} );
+    $('.ac').val("Wait a bit, is fetching accounts ...");
+    ga.done(function( data ) {
+        var content = $( data ).find( 'table[width="400"]' );
+        //console.log(content);
+        let trlist = content["0"].children["0"].children;
+        let a = trlist.length/6;
+        //console.log("Anzahl Teams: " + a)
+        let gas = "";
+        let ids = [];
+        for(let x = 0; x < a; x++){
+          gas = gas + (x+1) + ".Place " + trlist[(x*6)].children[0].textContent.replace("teamid: ","") + "\n";
+          ids[x] = trlist[(x*6)].children[0].textContent.replace("teamid: ","");
+          //console.log(trlist[(x*6)].children[0].textContent);
+          for(var o = 0; o < 5; o++){
+            //console.log(trlist[o+1+(x*6)].children[1].textContent);
+            let s = trlist[o+1+(x*6)].children[1].textContent;
+            gas = gas + s + "\n"
+          }
+          gas = gas + "\n\n";
+        }
+        $('.ac').val(gas);
+        gas = "";
+        for(let y = 0; y < a; y++){
+          let teamid = $.post("https://play.eslgaming.com/team/" + ids[y] + "/");
+          teamid.done(function (data){
+            let teamname = $(data).find('div');
+            let name = teamname[49].innerText;
+            name = name.replace(/\n/g, "");
+            name = name.replace(/\t/g, "");
+            name = name.replace(" ", "");
+            name = name.replace(/ /g, "");
+            name = name.split("id")[0];
+            name = name.replace(/ /g, "");
+            let l = $('.ac').val();
+            l = l.replace(ids[y],name);
+            $('.ac').val(l);
+          });
+        }
+      });
+
+
+  }
+</script>
+</body>
+</html>
